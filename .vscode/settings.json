@@ -1,0 +1,14 @@
+{
+    "files.associations": {
+        "graphics.h": "c",
+        "sdl_main.h": "c",
+        "sdl.h": "c",
+        "sdl_events.h": "c",
+        "sdl_platform_defines.h": "c",
+        "stdbool.h": "c",
+        "cstdlib": "c",
+        "web_stubs.h": "c",
+        "raylib.h": "c",
+        "stdio.h": "c"
+    }
+}

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinite Runner - WebAssembly</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .game-container {
+            border: 2px solid #444;
+            background-color: #2a2a2a;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+        
+        canvas {
+            display: block;
+            background-color: #1a2050;
+            border: 1px solid #666;
+        }
+        
+        .controls {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .status {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #333;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .warning {
+            background-color: #664400;
+            border: 1px solid #cc8800;
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        
+        button {
+            background-color: #444;
+            color: white;
+            border: 1px solid #666;
+            padding: 8px 16px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        
+        button:hover {
+            background-color: #555;
+        }
+        
+        button:disabled {
+            background-color: #222;
+            color: #666;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏃 Infinite Runner</h1>
+        <p>WebAssembly Demo Build</p>
+    </div>
+    
+    <div class="warning">
+        <strong>⚠️ Demo Build Notice:</strong><br>
+        This WebAssembly build uses stub graphics functions for demonstration purposes. 
+        The canvas shows a mock representation of what the game would render. 
+        For full functionality, Raylib would need to be compiled for WebAssembly.
+    </div>
+    
+    <div class="game-container">
+        <canvas id="gameCanvas" width="800" height="450"></canvas>
+    </div>
+    
+    <div class="controls">
+        <button id="startBtn">Start Game</button>
+        <button id="pauseBtn" disabled>Pause</button>
+        <button id="resetBtn">Reset</button>
+    </div>
+    
+    <div class="status" id="status">
+        WebAssembly module not loaded
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const status = document.getElementById('status');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        
+        let isRunning = false;
+        let isPaused = false;
+        let animationId = null;
+        let frameCount = 0;
+        
+        // Mock game state for demonstration
+        let player = { x: 100, y: 300, width: 50, height: 50 };
+        let obstacles = [
+            { x: 300, y: 200, width: 80, height: 30 },
+            { x: 500, y: 250, width: 100, height: 100 },
+            { x: 750, y: 150, width: 50, height: 50 }
+        ];
+        
+        function updateStatus(message) {
+            status.textContent = message;
+        }
+        
+        function drawMockGame() {
+            // Clear canvas with dark blue background (matching the C code)
+            ctx.fillStyle = '#141e50';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw mock rectangles (matching the test rectangles in main.c)
+            ctx.fillStyle = '#ff0000'; // Red
+            ctx.fillRect(100, 100, 50, 50);
+            
+            ctx.fillStyle = '#00ff00'; // Green  
+            ctx.fillRect(200, 150, 80, 30);
+            
+            ctx.fillStyle = '#0000ff'; // Blue
+            ctx.fillRect(350, 200, 100, 100);
+            
+            // Draw mock text
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '16px Courier New';
+            ctx.fillText('Infinite Runner - WebAssembly Demo', 10, 30);
+            ctx.font = '12px Courier New';
+            ctx.fillText('Mock graphics rendering - Frame: ' + frameCount, 10, 50);
+            
+            // Add some animation to show it's "running"
+            if (isRunning && !isPaused) {
+                // Move obstacles left
+                obstacles.forEach(obstacle => {
+                    obstacle.x -= 2;
+                    if (obstacle.x + obstacle.width < 0) {
+                        obstacle.x = canvas.width + Math.random() * 200;
+                    }
+                });
+                
+                // Draw moving obstacles
+                ctx.fillStyle = '#ff8800';
+                obstacles.forEach(obstacle => {
+                    ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+                });
+                
+                // Draw player
+                ctx.fillStyle = '#00ffff';
+                ctx.fillRect(player.x, player.y, player.width, player.height);
+                
+                frameCount++;
+            }
+        }
+        
+        function gameLoop() {
+            if (isRunning && !isPaused) {
+                drawMockGame();
+                animationId = requestAnimationFrame(gameLoop);
+            }
+        }
+        
+        function startGame() {
+            isRunning = true;
+            isPaused = false;
+            startBtn.disabled = true;
+            pauseBtn.disabled = false;
+            updateStatus('Game running (mock graphics)');
+            gameLoop();
+        }
+        
+        function pauseGame() {
+            isPaused = !isPaused;
+            pauseBtn.textContent = isPaused ? 'Resume' : 'Pause';
+            if (!isPaused) {
+                updateStatus('Game running (mock graphics)');
+                gameLoop();
+            } else {
+                updateStatus('Game paused');
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                }
+            }
+        }
+        
+        function resetGame() {
+            isRunning = false;
+            isPaused = false;
+            frameCount = 0;
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+            pauseBtn.textContent = 'Pause';
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+            
+            // Reset game state
+            obstacles.forEach((obstacle, i) => {
+                obstacle.x = 300 + i * 200 + Math.random() * 100;
+            });
+            
+            drawMockGame();
+            updateStatus('Game reset - Ready to start');
+        }
+        
+        // Event listeners
+        startBtn.addEventListener('click', startGame);
+        pauseBtn.addEventListener('click', pauseGame);
+        resetBtn.addEventListener('click', resetGame);
+        
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && isRunning) {
+                e.preventDefault();
+                // Mock jump animation
+                player.y = Math.max(200, player.y - 20);
+                setTimeout(() => {
+                    player.y = Math.min(300, player.y + 20);
+                }, 200);
+            }
+        });
+        
+        // Initialize
+        drawMockGame();
+        updateStatus('Ready to start - Use SPACE to jump when running');
+        
+        // Note: In a real WASM implementation, you would load the .wasm file here
+        // and call the exported functions instead of using mock graphics
+        console.log('To load actual WASM module, you would use:');
+        console.log('WebAssembly.instantiateStreaming(fetch("infinite-runner.wasm"))');
+    </script>
+</body>
+</html>
