@@ -34,11 +34,9 @@ int main(void) {
         graphics_draw_rectangle((GfxRectangle){200, 150, 80, 30}, COLOR_GREEN);
         graphics_draw_rectangle((GfxRectangle){350, 200, 100, 100}, COLOR_BLUE);
         
-        // Draw test text (Raylib only for now)
-        #ifdef GRAPHICS_BACKEND_RAYLIB
-            graphics_draw_text("Infinite Runner - Press ESC to close", 10, 10, 20, COLOR_WHITE);
-            graphics_draw_text("WASD to test (placeholder)", 10, 40, 16, COLOR_GRAY);
-        #endif
+        
+        graphics_draw_text("Infinite Runner - Press ESC to close", 10, 10, 20, COLOR_WHITE);
+        graphics_draw_text("WASD to test (placeholder)", 10, 40, 16, COLOR_GRAY);
         
         graphics_end_frame();
     }

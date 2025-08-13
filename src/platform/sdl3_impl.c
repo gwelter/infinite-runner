@@ -88,6 +88,8 @@ void platform_graphics_draw_text(const char* text, int x, int y, int size, GfxCo
     (void)y;
     (void)size;
     (void)color;
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+    SDL_RenderDebugText(renderer, x, y, text);
 }
 
 int platform_graphics_load_texture(const char* filename) {
