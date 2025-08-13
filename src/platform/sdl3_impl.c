@@ -47,6 +47,8 @@ bool platform_graphics_should_close(void) {
     while (SDL_PollEvent(&e)) {
         if (e.type == SDL_EVENT_QUIT) {
             should_close = true;
+        } else if (e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_ESCAPE) {
+            should_close = true;
         }
     }
     return should_close;

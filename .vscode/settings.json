@@ -9,6 +9,8 @@
         "cstdlib": "c",
         "web_stubs.h": "c",
         "raylib.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "sdl_keyboard.h": "c",
+        "sdl_keycode.h": "c"
     }
 }
