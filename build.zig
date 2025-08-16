@@ -9,7 +9,7 @@ pub fn build(b: *std.Build) void {
         enum { raylib, sdl3 },
         "graphics",
         "Graphics backend to use (raylib or sdl3)",
-    ) orelse .raylib;
+    ) orelse .sdl3;
 
     const exe = b.addExecutable(.{
         .name = "infinite-runner",
@@ -55,34 +55,42 @@ pub fn build(b: *std.Build) void {
                 exe.linkSystemLibrary("SDL3");
                 exe.linkLibC();
             } else {
-                // SDL3 WebAssembly support would need special configuration
+                // SDL3 WebAssembly: Limited support via Zig. Use 'zig build wasm' for full Emscripten build
                 exe.linkLibC();
             }
         },
     }
 
-    // WebAssembly target configuration
+    // WebAssembly target configuration (for Zig WASM builds)
     if (is_wasm) {
         exe.root_module.addCMacro("PLATFORM_WEB", "1");
         exe.root_module.addCMacro("NO_STDIO", "1");
 
-        // Note: For a complete WebAssembly build, you would need:
-        // 1. Raylib compiled for WebAssembly
-        // 2. Emscripten toolchain or similar setup
-        // 3. HTML shell and JavaScript glue code
-        //
-        // This build creates the WASM module but requires additional
-        // web infrastructure to run in a browser
+        // Note: This creates a basic WASM module with limited graphics support.
+        // For full SDL3 WebAssembly functionality, use: zig build wasm
     }
 
     b.installArtifact(exe);
 
-    // Web deployment step
-    if (is_wasm) {
-        const web_copy = b.step("web", "Copy WASM file to web folder");
-        const copy_wasm = b.addInstallFile(exe.getEmittedBin(), "../web/infinite-runner.wasm");
-        web_copy.dependOn(&copy_wasm.step);
-    }
+    // SDL3 WebAssembly build using Emscripten
+    const wasm_step = b.step("wasm", "Build SDL3 WebAssembly version using Emscripten");
+    const emcc_cmd = b.addSystemCommand(&.{
+        "emcc",
+        "src/main.c",
+        "src/engine/graphics.c",
+        "src/platform/sdl3_impl.c",
+        "-DGRAPHICS_BACKEND_SDL3=1",
+        "-D__EMSCRIPTEN__=1",
+        "-sUSE_SDL=3",
+        "-sASSERTIONS=1",
+        "-sWASM=1",
+        "-sASYNCIFY",
+        "-sEXPORTED_FUNCTIONS=[\"_main\"]",
+        "-sEXPORTED_RUNTIME_METHODS=[\"ccall\",\"cwrap\"]",
+        "-o",
+        "web/game.js",
+    });
+    wasm_step.dependOn(&emcc_cmd.step);
 
     // Run command
     const run_cmd = b.addRunArtifact(exe);

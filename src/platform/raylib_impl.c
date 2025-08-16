@@ -1,11 +1,7 @@
 #ifdef GRAPHICS_BACKEND_RAYLIB
 
 #include "../engine/graphics.h"
-#ifdef PLATFORM_WEB
-#include "web_stubs.h"
-#else
 #include <raylib.h>
-#endif
 
 // Convert our GfxColor to Raylib Color
 static Color raylib_color_from_gfx_color(GfxColor color) {

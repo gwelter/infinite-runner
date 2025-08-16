@@ -32,12 +32,12 @@ brew install raylib
 
 ## Building
 
-### Build with Raylib (Default)
+### Build with Raylib
 ```bash
 zig build -Dgraphics=raylib
 ```
 
-### Build with SDL3
+### Build with SDL3 (Default)
 ```bash
 zig build -Dgraphics=sdl3
 ```
@@ -63,8 +63,8 @@ zig build -Doptimize=ReleaseFast -Dgraphics=raylib
 
 ### WebAssembly builds
 ```bash
-# Build WASM module and copy to web folder
-zig build -Dtarget=wasm32-wasi -Dgraphics=raylib web
+# Build WASM module (SDL3 for now) and copy to web folder
+zig build wasm
 
 # Serve the web files
 cd web

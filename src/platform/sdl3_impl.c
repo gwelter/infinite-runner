@@ -9,7 +9,7 @@ static SDL_Renderer* renderer = NULL;
 static bool should_close = false;
 
 void platform_graphics_init(int width, int height, const char* title) {
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+    if (!SDL_Init(SDL_INIT_VIDEO)) {
         SDL_Log("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
         return;
     }
