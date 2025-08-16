@@ -26,49 +26,20 @@ pub fn build(b: *std.Build) void {
         .flags = &.{ "-std=c99", "-Wall", "-Wextra" },
     });
 
-    // Check if we're building for WebAssembly
-    const is_wasm = target.result.cpu.arch == .wasm32;
-
     // Add platform-specific backend
     switch (graphics_backend) {
         .raylib => {
             exe.addCSourceFile(.{ .file = b.path("src/platform/raylib_impl.c") });
             exe.root_module.addCMacro("GRAPHICS_BACKEND_RAYLIB", "1");
-
-            if (!is_wasm) {
-                // Link Raylib (system or package manager) - native only
-                exe.linkSystemLibrary("raylib");
-                exe.linkLibC();
-            } else {
-                // For WebAssembly, we need a different approach
-                // Raylib for web is typically compiled as a static library
-                // This would need the raylib WASM build
-                exe.linkLibC();
-            }
+            exe.linkSystemLibrary("raylib");
         },
         .sdl3 => {
             exe.addCSourceFile(.{ .file = b.path("src/platform/sdl3_impl.c") });
             exe.root_module.addCMacro("GRAPHICS_BACKEND_SDL3", "1");
-
-            if (!is_wasm) {
-                // Link SDL3 - native only
-                exe.linkSystemLibrary("SDL3");
-                exe.linkLibC();
-            } else {
-                // SDL3 WebAssembly: Limited support via Zig. Use 'zig build wasm' for full Emscripten build
-                exe.linkLibC();
-            }
+            exe.linkSystemLibrary("SDL3");
         },
     }
-
-    // WebAssembly target configuration (for Zig WASM builds)
-    if (is_wasm) {
-        exe.root_module.addCMacro("PLATFORM_WEB", "1");
-        exe.root_module.addCMacro("NO_STDIO", "1");
-
-        // Note: This creates a basic WASM module with limited graphics support.
-        // For full SDL3 WebAssembly functionality, use: zig build wasm
-    }
+    exe.linkLibC();
 
     b.installArtifact(exe);
 
