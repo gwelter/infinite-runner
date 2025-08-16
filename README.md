@@ -85,12 +85,10 @@ infinite-runner/
 │   │   └── graphics.h/.c       # Graphics API
 │   └── platform/               # Backend implementations
 │       ├── raylib_impl.c       # Raylib backend
-│       ├── sdl3_impl.c         # SDL3 backend
-│       └── web_stubs.h         # WebAssembly graphics stubs
+│       └── sdl3_impl.c         # SDL3 backend
 ├── web/                        # WebAssembly web shell
 │   ├── index.html              # HTML page with demo
-│   ├── wasm-loader.js          # WASM loader utilities
-│   └── README.md               # Web build instructions
+│   ├── game.js          # WASM loader utilities
 ├── assets/                     # Game assets
 └── build.zig                   # Zig build configuration
 ```
@@ -107,8 +105,7 @@ This is a basic boilerplate with:
 - ✅ Raylib backend with window and basic drawing (tested and working)
 - ⚠️ SDL3 backend with window and basic drawing (compiles but requires SDL3 installation)
 - ✅ Interchangeable backends at compile time
-- ✅ WebAssembly compilation support (with stub graphics for demonstration)
-- ✅ HTML shell with mock game demonstration and WASM loading infrastructure
+- ✅ WebAssembly compilation support (for SDL3)
 - 🚧 Game mechanics (player, obstacles, physics) - TODO
 - 🚧 Audio system - TODO
 - 🚧 Input handling - TODO
@@ -116,4 +113,4 @@ This is a basic boilerplate with:
 **Notes:**
 - SDL3 is still in development and not widely available in package managers
 - WebAssembly builds use graphics stubs; full web support requires Raylib WASM build
-- Project compiles successfully for native (Raylib), WebAssembly (stubs), and SDL3 (with library)
+- Project compiles successfully for native and WebAssembly (with SDL3 library), and Raylib
